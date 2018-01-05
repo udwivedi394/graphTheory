@@ -51,6 +51,22 @@ class Graph:
 		print
 		return
 
+	def DFS(self,start):
+		visited = [False]*len(self.arr)
+		stack = []
+		node = start
+		while 1:
+			while visited[node]==False:
+				print node,
+				visited[node]=True
+				stack.append(node)
+				node = self.arr[node].data
+
+			node = stack.pop()
+			
+		return
+
+"""
 graph1 = Graph(5)
 graph1.addEdge(0,1)
 graph1.addEdge(0,4)
@@ -60,8 +76,7 @@ graph1.addEdge(1,4)
 graph1.addEdge(2,3)
 graph1.addEdge(3,4)
 
-graph1.printGraph()
-
+#graph1.printGraph()
 graph1.BFS(0)
 
 
@@ -73,8 +88,9 @@ graph2.addEdge(2,0)
 graph2.addEdge(2,3)
 graph2.addEdge(3,3)
 
+graph2.printGraph()
 graph2.BFS(2)
-
+"""
 g3 = Graph(7)
 g3.addEdge(1,3)
 g3.addEdge(1,2)
@@ -85,4 +101,5 @@ g3.addEdge(4,6)
 g3.addEdge(4,5)
 g3.addEdge(5,6)
 
+g3.printGraph()
 g3.BFS(1)
