@@ -1,41 +1,44 @@
 import directedGraph as dirG
+import time
 
-def DFS(graph):
+def detectCycle(graph):
 	vertices = graph.getVertices()
-	visited = [False]*len(vertices)
-	DFSUtil(vertices,0,visited)
+	print vertices
+	recursionStack = []
+	for i in range(len(vertices)):
+		visited = [False]*len(vertices)
+		if detectCycleUtil(vertices,i,visited,recursionStack):
+			return True
+		print
+	return False
 
-def DFSUtil(graph,cur_vertex,visited):
-	done = True
-	while done:
-		if visited[cur_vertex]==False:
-			print cur_vertex,
-			visited[cur_vertex]=True
-		
-		if graph[cur_vertex]:
-			DFSUtil(graph,graph[cur_vertex].data,visited)
+def detectCycleUtil(graph,v,visited,recursionStack):
+	visited[v] = True
+	print v,
+	
+	recursionStack.append(v)
+	
+	check=False
+	for i in graph[v]:
+		if visited[i]==False:
+			check = detectCycleUtil(graph,i,visited,recursionStack)
 
-		temp = graph[cur_vertex]
-		found = False
-		while temp:
-			if visited[temp.data]==False:
-				found = True
-				cur_vertex = temp.data
-				break
-			temp = temp.next
-		if found==False:
-			done = False
-	return
+		if i in recursionStack:
+			return True
 
-g1 = dirG.DirectedGraph(5)
-#g1.addEdge(0,1)
+		if check:
+			return True
+	recursionStack.pop()
+	return False
+
+g1 = dirG.DirectedGraph()
+g1.addEdge(0,1)
 g1.addEdge(0,2)
-#g1.addEdge(1,1)
+g1.addEdge(1,1)
 g1.addEdge(1,2)
 g1.addEdge(2,0)
 g1.addEdge(2,3)
 g1.addEdge(3,4)
 
 g1.printGraph()
-#detectCycle(g1)
-DFS(g1)
+print detectCycle(g1)

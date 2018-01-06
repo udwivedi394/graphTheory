@@ -1,35 +1,34 @@
-class Node:
-	def __init__(self,data):
-		self.data = data
-		self.next = None
-
 class DirectedGraph:
-	def __init__(self,vertices):
-		self.arr = [None]*vertices
+	def __init__(self):
+		self.graph = {}
 
 	def addEdge(self,u,v):
-		temp = self.arr[u]
-		self.arr[u] = Node(v)
-		self.arr[u].next = temp
+		if self.graph.get(u):
+			self.graph[u].append(v)
+		else:
+			self.graph[u] = [v]
+
+		if self.graph.get(v)==None:
+			self.graph[v] = []
 		return
 
 	def printGraph(self):
 		print
-		for i in range(len(self.arr)):
+		for i in range(len(self.graph)):
 			print "Adjacency list of vertex",i
-			print "Head",
-			temp = self.arr[i]
-			while temp:
-				print "->",temp.data,
-				temp = temp.next
-			print
+			print "Head:",
+			if self.graph.get(i):
+				print self.graph[i]
+			else:
+				self.graph[i] = []
 		return
-	
+
 	#Prints the Bread First Traversal for a Graph
 	def BFS(self,start):
-		visited = [False]*len(self.arr)
+		visited = [False]*len(self.graph)
 		queue = [start]
-
+		
+		print self.graph
 		while len(queue):
 			n = len(queue)
 			while n:
@@ -40,56 +39,23 @@ class DirectedGraph:
 			
 				print temp,
 				visited[temp] = True
-				node = self.arr[temp]
-				while node:
-					queue.append(node.data)
-					node = node.next
+				for i in self.graph[temp]:
+					queue.append(i)
 				n -= 1
 		print
 		return
 
-	#Depth First Traversal
 	def DFS(self,start):
-		visited = [False]*len(self.arr)
-		stack = []
-		
-		#Start from the vertex given
-		node = start
-		while 1:
-			#Keep on visiting till the current vertex is not already visited
-			while visited[node]==False:
-				#Print the node
-				print node,
-				#Mark the current vertex as visited, and push it in stack
-				visited[node]=True
-				stack.append(node)
-				if self.arr[node]:
-					#Move to the next vertex given in adjancy
-					node = self.arr[node].data
+		visited = [False]*len(self.graph)
+		self.DFSUtil(start,visited)
 
-			#If the last vertex is visted and stack is not empty
-			while visited[node] and len(stack):
-				#Take the top of the stack as current vertex
-				node = stack[-1]
-				#Traverse the linkedlist attached at the head of it, and find for any unvisited vertex
-				temp = self.arr[node]
-				found = False
-				while temp:
-					if visited[temp.data]==False:
-						found = True
-						break
-					temp = temp.next
-				if found:
-					#If unvisited vertex found set the node to it
-					node = temp.data
-				else:
-					#Otherwise pop the top
-					stack.pop()
-
-			#If current vertex is already visited and stack is empty then traverse is complete
-			if visited[node] and len(stack)==0:
-				break
+	def DFSUtil(self,v,visited):
+		visited[v] = True
+		print v,
+		for i in self.graph[v]:
+			if visited[i] == False:
+				self.DFSUtil(i,visited)
 		return
 
 	def getVertices(self):
-		return self.arr
+		return self.graph

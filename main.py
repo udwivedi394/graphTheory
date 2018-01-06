@@ -52,7 +52,7 @@ g3.DFS(1)
 #Directed graph
 print "\n------------------------"
 print "Directed Graphs"
-graph1 = dirG.DirectedGraph(5)
+graph1 = dirG.DirectedGraph()
 graph1.addEdge(0,1)
 graph1.addEdge(0,4)
 graph1.addEdge(1,2)
@@ -67,7 +67,7 @@ graph1.BFS(0)
 print "\nDFS:"
 graph1.DFS(0)
 
-graph2 = dirG.DirectedGraph(4)
+graph2 = dirG.DirectedGraph()
 graph2.addEdge(0,1)
 graph2.addEdge(0,2)
 graph2.addEdge(1,2)
@@ -77,11 +77,11 @@ graph2.addEdge(3,3)
 
 graph2.printGraph()
 print "\nBFS:"
-graph2.BFS(0)
+graph2.BFS(2)
 print "\nDFS:"
-graph2.DFS(0)
+graph2.DFS(2)
 
-g3 = dirG.DirectedGraph(7)
+g3 = dirG.DirectedGraph()
 g3.addEdge(1,3)
 g3.addEdge(1,2)
 g3.addEdge(2,5)
