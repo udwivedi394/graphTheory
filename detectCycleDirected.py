@@ -1,54 +1,5 @@
 import directedGraph as dirG
 
-def detectCycle(graph):
-	stack = []
-	vertices = graph.getVertices()
-	node = 0
-	visited = [False]*len(vertices)
-	recursionStack = []
-
-	noloop = True
-	while noloop:
-		while visited[node]==False:
-			print node,
-			visited[node]=True
-
-			stack.append(node)
-			if vertices[node]:
-				node = vertices[node].data
-			
-			print "InLoop:",recursionStack
-			if vertices[node] and node in recursionStack:
-				noloop = False
-				break
-			else:
-				recursionStack.append(node)
-			
-		
-		while visited[node] and len(stack) and noloop:
-			node = stack[-1]
-			temp = vertices[node]
-			found = False
-			while temp:
-				if visited[temp.data]==False:
-					found=True
-					break
-				#if temp.data in recursionStack:
-				#	noloop = False
-					break
-				temp = temp.next
-			if found:
-				node = temp.data
-			else:
-				stack.pop()
-
-		if visited[node] and len(stack)==0:
-			break
-
-	print recursionStack
-	print not noloop
-	return not noloop
-
 def DFS(graph):
 	vertices = graph.getVertices()
 	visited = [False]*len(vertices)
