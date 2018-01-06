@@ -18,6 +18,7 @@ class Graph:
 		return
 
 	def printGraph(self):
+		print
 		for i in range(len(self.arr)):
 			print "Adjacency list of vertex",i
 			print "Head",
@@ -62,11 +63,21 @@ class Graph:
 				stack.append(node)
 				node = self.arr[node].data
 
-			node = stack.pop()
-			
+			while visited[node] and len(stack):
+				node = stack.pop()
+				temp = self.arr[node]
+				found = False
+				while temp:
+					if visited[temp.data]==False:
+						found = True
+						break
+					temp = temp.next
+				if found:
+					node = temp.data
+			if visited[node] and len(stack)==0:
+				break
 		return
 
-"""
 graph1 = Graph(5)
 graph1.addEdge(0,1)
 graph1.addEdge(0,4)
@@ -76,9 +87,11 @@ graph1.addEdge(1,4)
 graph1.addEdge(2,3)
 graph1.addEdge(3,4)
 
-#graph1.printGraph()
+graph1.printGraph()
+print "\nBFS:"
 graph1.BFS(0)
-
+print "\nDFS:"
+graph1.DFS(0)
 
 graph2 = Graph(4)
 graph2.addEdge(0,1)
@@ -89,8 +102,11 @@ graph2.addEdge(2,3)
 graph2.addEdge(3,3)
 
 graph2.printGraph()
+print "\nBFS:"
 graph2.BFS(2)
-"""
+print "\nDFS:"
+graph2.DFS(2)
+
 g3 = Graph(7)
 g3.addEdge(1,3)
 g3.addEdge(1,2)
@@ -102,4 +118,7 @@ g3.addEdge(4,5)
 g3.addEdge(5,6)
 
 g3.printGraph()
+print "\nBFS:"
 g3.BFS(1)
+print "\nDFS:"
+g3.DFS(1)
