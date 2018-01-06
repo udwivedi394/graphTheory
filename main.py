@@ -3,7 +3,7 @@ import undirectedGraph as undirG
 
 #Driver program for undirected Graph
 print "\n------------------------"
-print "Directed Graphs"
+print "UnDirected Graphs"
 graph1 = undirG.UnDirGraph(5)
 graph1.addEdge(0,1)
 graph1.addEdge(0,4)
@@ -29,9 +29,9 @@ graph2.addEdge(3,3)
 
 graph2.printGraph()
 print "\nBFS:"
-graph2.BFS(2)
+graph2.BFS(0)
 print "\nDFS:"
-graph2.DFS(2)
+graph2.DFS(0)
 
 g3 = undirG.UnDirGraph(7)
 g3.addEdge(1,3)
@@ -77,9 +77,9 @@ graph2.addEdge(3,3)
 
 graph2.printGraph()
 print "\nBFS:"
-graph2.BFS(3)
+graph2.BFS(0)
 print "\nDFS:"
-graph2.DFS(3)
+graph2.DFS(0)
 
 g3 = dirG.DirectedGraph(7)
 g3.addEdge(1,3)

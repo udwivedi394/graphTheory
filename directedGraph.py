@@ -90,3 +90,6 @@ class DirectedGraph:
 			if visited[node] and len(stack)==0:
 				break
 		return
+
+	def getVertices(self):
+		return self.arr
