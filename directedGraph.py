@@ -3,7 +3,7 @@ class Node:
 		self.data = data
 		self.next = None
 
-class Graph:
+class DirectedGraph:
 	def __init__(self,vertices):
 		self.arr = [None]*vertices
 
@@ -11,10 +11,6 @@ class Graph:
 		temp = self.arr[u]
 		self.arr[u] = Node(v)
 		self.arr[u].next = temp
-
-		temp2 = self.arr[v]
-		self.arr[v] = Node(u)
-		self.arr[v].next = temp2
 		return
 
 	def printGraph(self):
@@ -52,19 +48,30 @@ class Graph:
 		print
 		return
 
+	#Depth First Traversal
 	def DFS(self,start):
 		visited = [False]*len(self.arr)
 		stack = []
+		
+		#Start from the vertex given
 		node = start
 		while 1:
+			#Keep on visiting till the current vertex is not already visited
 			while visited[node]==False:
+				#Print the node
 				print node,
+				#Mark the current vertex as visited, and push it in stack
 				visited[node]=True
 				stack.append(node)
-				node = self.arr[node].data
+				if self.arr[node]:
+					#Move to the next vertex given in adjancy
+					node = self.arr[node].data
 
+			#If the last vertex is visted and stack is not empty
 			while visited[node] and len(stack):
-				node = stack.pop()
+				#Take the top of the stack as current vertex
+				node = stack[-1]
+				#Traverse the linkedlist attached at the head of it, and find for any unvisited vertex
 				temp = self.arr[node]
 				found = False
 				while temp:
@@ -73,52 +80,13 @@ class Graph:
 						break
 					temp = temp.next
 				if found:
+					#If unvisited vertex found set the node to it
 					node = temp.data
+				else:
+					#Otherwise pop the top
+					stack.pop()
+
+			#If current vertex is already visited and stack is empty then traverse is complete
 			if visited[node] and len(stack)==0:
 				break
 		return
-
-graph1 = Graph(5)
-graph1.addEdge(0,1)
-graph1.addEdge(0,4)
-graph1.addEdge(1,2)
-graph1.addEdge(1,3)
-graph1.addEdge(1,4)
-graph1.addEdge(2,3)
-graph1.addEdge(3,4)
-
-graph1.printGraph()
-print "\nBFS:"
-graph1.BFS(0)
-print "\nDFS:"
-graph1.DFS(0)
-
-graph2 = Graph(4)
-graph2.addEdge(0,1)
-graph2.addEdge(0,2)
-graph2.addEdge(1,2)
-graph2.addEdge(2,0)
-graph2.addEdge(2,3)
-graph2.addEdge(3,3)
-
-graph2.printGraph()
-print "\nBFS:"
-graph2.BFS(2)
-print "\nDFS:"
-graph2.DFS(2)
-
-g3 = Graph(7)
-g3.addEdge(1,3)
-g3.addEdge(1,2)
-g3.addEdge(2,5)
-g3.addEdge(2,4)
-g3.addEdge(3,5)
-g3.addEdge(4,6)
-g3.addEdge(4,5)
-g3.addEdge(5,6)
-
-g3.printGraph()
-print "\nBFS:"
-g3.BFS(1)
-print "\nDFS:"
-g3.DFS(1)

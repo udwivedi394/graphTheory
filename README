@@ -1,2 +1,11 @@
-graph.py
-Implementing the class Graph
+undirectedGraph.py
+Implementing the class UnDirGraph
+->Print the adjacency
+->Print the BFS
+->Print the DFS
+
+directedGraph.py
+Implementing the class DirectedGraph
+->Print the adjacency
+->Print the BFS
+->Print the DFS
