@@ -30,6 +30,31 @@ def detectCycleUndirected(graph):
 	print "No Cycle"
 	return False
 
+def detectCycleDFS(graph):
+	vertices = graph.getVertices()
+	#Create set of visited vertices
+	visitedSet = set([])
+	
+	#Start search from 0
+	return detectCycleDFSUtil(vertices,0,0,visitedSet)
+
+def detectCycleDFSUtil(graph,v,parent,visitedSet):
+	#If current vertex is present in VistedSet, then there is cycle
+	if v in visitedSet:
+		return True
+
+	#Add the current vertex in the visited set
+	visitedSet.add(v)
+	check = False
+	#Iterate through all the adjacent edges
+	for i in graph[v]:
+		#Dont go in the direction of parent
+		if i != parent:
+			check = detectCycleDFSUtil(graph,i,v,visitedSet)
+		if check:
+			return True
+	return False
+
 g1 = undirG.UnDirGraph(6)
 g1.addEdge(0,1)
 g1.addEdge(0,5)
@@ -40,3 +65,4 @@ g1.addEdge(3,4)
 
 g1.printGraph()
 detectCycleUndirected(g1)
+print detectCycleDFS(g1)
