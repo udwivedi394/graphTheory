@@ -5,35 +5,40 @@ class Node:
 
 class UnDirGraph:
 	def __init__(self,vertices):
-		self.arr = [None]*vertices
+		self.graph = {}
+		self.vertices = vertices
+		for i in range(self.vertices):
+			self.graph[i]=[]
 
 	def addEdge(self,u,v):
-		temp = self.arr[u]
-		self.arr[u] = Node(v)
-		self.arr[u].next = temp
+		if self.graph.get(u):
+			self.graph[u].append(v)
+		else:
+			self.graph[u] = [v]
 
-		temp2 = self.arr[v]
-		self.arr[v] = Node(u)
-		self.arr[v].next = temp2
+		if self.graph.get(v):
+			self.graph[v].append(u)
+		else:
+			self.graph[v] = [u]
 		return
 
 	def printGraph(self):
 		print
-		for i in range(len(self.arr)):
+		for i in range(self.vertices):
 			print "Adjacency list of vertex",i
 			print "Head",
-			temp = self.arr[i]
-			while temp:
-				print "->",temp.data,
-				temp = temp.next
-			print
+			if self.graph.get(i):
+				print self.graph[i]
+			else:
+				self.graph[i] = []
 		return
 	
 	#Prints the Bread First Traversal for a Graph
 	def BFS(self,start):
-		visited = [False]*len(self.arr)
+		visited = [False]*len(self.graph)
 		queue = [start]
-
+		
+		print self.graph
 		while len(queue):
 			n = len(queue)
 			while n:
@@ -44,36 +49,23 @@ class UnDirGraph:
 			
 				print temp,
 				visited[temp] = True
-				node = self.arr[temp]
-				while node:
-					queue.append(node.data)
-					node = node.next
+				for i in self.graph[temp]:
+					queue.append(i)
 				n -= 1
 		print
 		return
-
+	
 	def DFS(self,start):
-		visited = [False]*len(self.arr)
-		stack = []
-		node = start
-		while 1:
-			while visited[node]==False:
-				print node,
-				visited[node]=True
-				stack.append(node)
-				node = self.arr[node].data
+		visited = [False]*len(self.graph)
+		self.DFSUtil(start,visited)
 
-			while visited[node] and len(stack):
-				node = stack.pop()
-				temp = self.arr[node]
-				found = False
-				while temp:
-					if visited[temp.data]==False:
-						found = True
-						break
-					temp = temp.next
-				if found:
-					node = temp.data
-			if visited[node] and len(stack)==0:
-				break
+	def DFSUtil(self,v,visited):
+		visited[v] = True
+		print v,
+		for i in self.graph[v]:
+			if visited[i] == False:
+				self.DFSUtil(i,visited)
 		return
+
+	def getVertices(self):
+		return self.graph
