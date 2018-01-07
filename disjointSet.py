@@ -51,6 +51,7 @@ def union(set1,set2):
 		#Set the parent of representative of set1 to representative of set2
 		set1.findSet().parent = set2.findSet()
 
+"""
 #Creating Lookup
 s = {}
 for i in range(8):
@@ -66,3 +67,4 @@ union(s[3],s[7])
 for i in range(len(s)):
 	print "\nSet:%d,Rank:%d,findSet:%d"%(i,s[i].rank,s[i].findSet().data)
 	s[i].printSet()
+"""

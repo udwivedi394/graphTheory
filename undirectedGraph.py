@@ -23,14 +23,14 @@ class UnDirGraph:
 		return
 
 	def printGraph(self):
-		print
 		for i in range(self.vertices):
-			print "Adjacency list of vertex",i
+			print "\nAdjacency list of vertex",i
 			print "Head",
 			if self.graph.get(i):
-				print self.graph[i]
+				print self.graph[i],
 			else:
 				self.graph[i] = []
+		print
 		return
 	
 	#Prints the Bread First Traversal for a Graph
