@@ -1,3 +1,7 @@
+INF = 9999999999
+import mapBinaryHeap as mapB
+import time
+
 class Node:
 	def __init__(self,vertex,data):
 		self.vertex = vertex
@@ -47,48 +51,49 @@ class Graph:
 				self.DFSUtil(i.vertex,visited)
 		return
 
-	#This method fails for large data, because of the maximum recursion depth
-	def printPaths(self,start,end):
-		visited = set()
-		#stack = []
-		return self.printPathsUtil(start,end,visited,0) #,stack)
-
-	def printPathsUtil(self,v,end,visited,overallValue): #,stack):	
-		if v==end:
-			#stack.append(v)
-			#print stack, overallValue
-			#stack.pop()
-			return overallValue
-		
-		#stack.append(v)
-		visited.add(v)
-			
-		mini = 10**8
-		for node in self.graph[v]:
-			if node.vertex not in visited:
-				if node.data > overallValue:
-					val = self.printPathsUtil(node.vertex,end,visited,node.data)#,stack)
-				else:
-					val = self.printPathsUtil(node.vertex,end,visited,overallValue)#,stack)
-				mini = min(mini,val)
-		#stack.pop()
-		visited.remove(v)			
-		return mini
-
 def jackGoesToRapture(N,edges):
 	graph = Graph(N)
-	
+
+	#Each Node in MapHeap, contains data in the form of [vertex,Distance]
+	mapHeap = mapB.MapHeap()
+
 	for edge in edges:
 		graph.addEdge(edge[0],edge[1],edge[2])
+		mapHeap.insert(edge[0],INF)
+		mapHeap.insert(edge[1],INF)
 	
-	#graph.printAdjacency()
-	#graph.DFS(1)
-	#print
-	val = graph.printPaths(1,N)
-	if val == 10**8:
-		return "NO PATH EXISTS"
-	return val
+	mapHeap.setData(1,0)
+	
+	vParent = {}
+	vDistance = {}
 
+	source = 1
+	while len(mapHeap.arr):
+		print mapHeap.arr
+		print mapHeap.lookup
+		current = mapHeap.extractMin()
+		print "Min Value:",current
+		mapHeap.delete(current[0])
+		time.sleep(0.2)
+
+		vDistance[current[0]] = current[1]
+		if current[0]==source:
+			vParent[current[0]] = None
+
+		for neighbour in graph.graph[current[0]]:
+			#If vertex exists in MapHeap then returns its position
+			print "Neighbour of",current[0],":",neighbour,
+			pos = mapHeap.contains(neighbour.vertex)
+			if pos==None:
+				continue
+			print "pos:",pos,mapHeap.arr,mapHeap.lookup	
+			print "HeapValue:",mapHeap.arr[pos][1],"New Distance:",vDistance[current[0]]+neighbour.data
+			if mapHeap.arr[pos][1] > vDistance[current[0]]+neighbour.data:
+				mapHeap.setData(neighbour.vertex, vDistance[current[0]]+neighbour.data)
+				vParent[neighbour.vertex] = current[0]
+
+	print vParent
+	print vDistance
 
 if __name__ == "__main__":
     N, E = raw_input().strip().split(' ')
