@@ -16,14 +16,7 @@ class Graph:
 			self.graph[i]=[]
 
 	def addEdge(self,u,v,data):
-		#if self.graph.get(u)==None:
-		#	self.graph[u] = [Node(v,data)]
-		#else:
 		self.graph[u].append(Node(v,data))
-
-		#if self.graph.get(v)==None:
-		#	self.graph[v] = [Node(u,data)]
-		#else:
 		self.graph[v].append(Node(u,data))
 		return
 	
@@ -40,16 +33,6 @@ class Graph:
 		return
 
 def dijkstraShortestPath(N,graph,mapHeap,start):
-	"""
-	graph = Graph(N)
-	#Each Node in MapHeap, contains data in the form of [vertex,Distance]
-	mapHeap = mapB.MapHeap()
-
-	for edge in edges:
-		graph.addEdge(edge[0],edge[1],edge[2])
-		mapHeap.insert(edge[0],INF)
-		mapHeap.insert(edge[1],INF)
-	"""
 	mapHeap.setData(start,0)
 	
 	#vParent = {}
