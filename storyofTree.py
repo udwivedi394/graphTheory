@@ -25,16 +25,32 @@ def DFS(graph,source,guesses):
 				count += (current,neighbor) in guesses
 	return count
 
+def DFS02(graph,source,guesses,cost):
+	stack = [(source,cost)]
+	visited = set()
+	t_win = 0
+	while stack:
+		(current,cost) = stack.pop()
+		t_win += cost >= k
+		visited.add(current)
+		#print current,
+
+		for neighbor in graph.graph[current]:
+			if neighbor not in visited:
+				stack.append((neighbor, cost - ((current,neighbor) in guesses) + ((neighbor,current) in guesses)))
+	return t_win
+
+
 def gcd(a,b):
 	if a==0:
 		return b
 	return gcd(b%a,a)
 
 def gameCount02(N,graph,guesses,g,k):
-	num = 0
 	den = N
-	cur_count = DFS(graph,source,guesses)
-	
+	cur_count = DFS(graph,1,guesses)
+	num = DFS02(graph,1,guesses,cur_count) 
+
 	div = gcd(num,den)
 	print "%d/%d"%(num/div,den/div)
 	return
@@ -70,7 +86,7 @@ for a0 in xrange(q):
         u,v = f1.readline().strip().split(' ')
         u,v = [int(u),int(v)]
         guesses.add((u,v))
-    gameCount(n,graph,guesses,g,k)
+    gameCount02(n,graph,guesses,g,k)
 
 """
 q = int(raw_input().strip())

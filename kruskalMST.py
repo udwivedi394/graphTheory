@@ -52,18 +52,9 @@ class Graph:
 
 	def addEdge(self,u,v,weight):
 		self.graph.append([u,v,weight])
-
 	
 	def sortedEdges(self):
 		self.graph = sorted(self.graph, key=lambda item: item[2]) 
-		return
-		#Bubble sort, optimize later
-		for i in range(len(self.graph)):
-			for j in range(len(self.graph)-i-1):
-				if self.graph[j][2] > self.graph[j+1][2]:
-					temp = self.graph[j]
-					self.graph[j] = self.graph[j+1]
-					self.graph[j+1] = temp
 		return
 
 def mst02(n, graph):
@@ -74,66 +65,27 @@ def mst02(n, graph):
 	graph.sortedEdges()
 	overallwt = 0
 		
-	i = 0
-	while i < len(graph.graph):
-		valid = False
-		selectedEdge = graph.graph[i]
-		while i < len(graph.graph) and selectedEdge[2]==graph.graph[i][2]:
-			edge = graph.graph[i]
-			cycle = False
+	last = 10**6
+	for edge in graph.graph:
+		if lookup[edge[0]].findSet()==lookup[edge[1]].findSet():
+			continue
+		else:
+			overallwt += edge[2]
+			union(lookup[edge[0]],lookup[edge[1]])
+	return overallwt
 
-			if lookup[edge[0]].findSet() == lookup[edge[1]].findSet():
-				cycle = True
+f1 = open("/home/utkarsh/utk_reboot/python/graphTheory/kruskalTestCase.txt",'r')
+if __name__ == "__main__":
+    n, m = f1.readline().strip().split(' ')
+    n, m = [int(n), int(m)]
+    graph = Graph(n)
+    for edges_i in xrange(m):
+        x,y,r = map(int,f1.readline().strip().split(' '))
+        graph.addEdge(x,y,r)
+    result = mst02(n, graph)
+    print result
 
-			if cycle==False:
-				if valid:
-					if sum(selectedEdge) >= sum(edge):
-						selectedEdge = edge
-					else:
-						selectedEdge = edge
-				valid = True
-			i += 1
-		if valid:
-			u = selectedEdge[0]
-			v = selectedEdge[1]
-			overallwt += selectedEdge[2]	
-			union(lookup[u],lookup[v])
-	print overallwt	
-
-def mst(n,graph):
-	graph.sortedEdges()
-	visitedSet = set()
-	overallwt = 0
-	i = 0
-
-	print graph.graph
-	while i < len(graph.graph):
-		valid = False
-		selectedEdge = graph.graph[i]
-		while i < len(graph.graph) and selectedEdge[2] == graph.graph[i][2]:
-			edge = graph.graph[i]
-			
-			if checkCycle:
-				if valid: 
-					if sum(selectedEdge) >= sum(edge):
-						selectedEdge = edge
-				else:
-					selectedEdge = edge
-				valid = True
-				print selectedEdge
-			i += 1
-
-		if valid:
-			u = selectedEdge[0]
-			v = selectedEdge[1]
-			wt = selectedEdge[2] 
-	
-			overallwt += wt
-			visitedSet.add(u)
-			visitedSet.add(v)
-	print overallwt
-	return
-
+"""
 if __name__ == "__main__":
     n, m = raw_input().strip().split(' ')
     n, m = [int(n), int(m)]
@@ -143,4 +95,4 @@ if __name__ == "__main__":
         graph.addEdge(x,y,r)
     result = mst02(n, graph)
     print result
-
+"""
