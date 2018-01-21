@@ -1,6 +1,8 @@
 #!/bin/python
 
 import sys
+import time
+
 class MapHeap:
         def __init__(self):
                 self.arr = []
@@ -11,14 +13,7 @@ class MapHeap:
                         return
 
                 self.arr.append([vertex,data])
-                i = len(self.arr)-1
-                self.lookup[vertex] = i
-
-                while self.arr[i][1] < parent(self.arr,i,1):
-                        val = self.lookup[vertex] = parent(self.arr,i)
-                        self.lookup[self.arr[val][0]] = i
-                        swap(self.arr,i,parent(self.arr,i))
-                        i = parent(self.arr,i)
+                self.lookup[vertex] = len(self.arr)-1
                 return
 
         def delete(self,vertex):
@@ -39,16 +34,13 @@ class MapHeap:
                     minNode = self.minHeapify(inp)
                     if inp==minNode:
                         break
-                    inp = minNode
-                    
-                #self.minHeapify()
+                    inp = minNode    
                 return delVal
             
         def minHeapify(self,k=0):
                 leftNode = leftChild(self.arr,k)
                 rightNode = rightChild(self.arr,k)
 
-                #print "Heapify",leftNode,rightNode
                 minNode = k
                 if leftNode and self.arr[leftNode][1] < self.arr[minNode][1]:
                         minNode = leftNode
@@ -60,7 +52,6 @@ class MapHeap:
                         self.lookup[self.arr[minNode][0]] = k
 
                         swap(self.arr,minNode,k)
-                        #self.minHeapify(minNode)
                 return minNode
 
         def extractMin(self):
@@ -121,30 +112,38 @@ INF = 10**8
 
 class Graph:
         def __init__(self,vertices):
-                self.graph = {}
                 self.vertices = vertices
-                for i in range(1,vertices+1):
-                    self.graph[i] = {}
+                self.graph = {}
+
+		for i in range(1,vertices+1):
+                	self.graph[i] = {}
 
         def addEdge(self,u,v,data):
-                #if self.graph.get(u)==None:
-                #        self.graph[u] = [Node(v,data)]
-                #else:
-                value = self.graph[u].get(v)
-                self.graph[u][v]= min(value,data) if value!=None else data
-                
-                #if self.graph.get(v)==None:
-                #        self.graph[v] = [Node(u,data)]
-                #else:
-                #value = self.graph[v].get(u)
-                self.graph[v][u]= min(value,data) if value!=None else data
+		value = self.graph[u].get(v)
+                value = min(value,data) if value!=None else data
+
+		self.graph[u][v]= value                
+                self.graph[v][u]= value
                 return
+	
+	def addEdges(self,edges):
+		for edge in edges:
+			u = edge[0]
+			v = edge[1]
+			data = edge[2]
+			value = self.graph[u].get(v)
+                	value = min(value,data) if value!=None else data
+
+			self.graph[u][v]= value                
+                	self.graph[v][u]= value
+                return
+			
             
 def dijkstraShortestPath(N,graph,mapHeap,start):
         mapHeap.setData(start,0)
         vDistance = {}
 
-        while len(mapHeap.arr):
+        while mapHeap.arr:
                 current = mapHeap.extractMin()
                 mapHeap.delete(current[0])
 
@@ -163,7 +162,57 @@ def dijkstraShortestPath(N,graph,mapHeap,start):
                 if i!=start:
                         print vDistance[i] if vDistance[i]!=INF else -1,
         return
-            
+
+def dijkstraShortestPath02(N,graph,mapHeap,start):
+        mapHeap.setData(start,0)
+        vDistance = {}
+
+        while mapHeap.arr:
+                current = mapHeap.extractMin()
+                mapHeap.delete(current[0])
+
+                vDistance[current[0]] = current[1]
+
+                for neighbour in range(graph.vertices+1):
+                        #If vertex exists in MapHeap then returns its position
+                        pos = mapHeap.contains(graph.graph[current[0]][neighbour])
+                        if pos==None:
+                                continue
+                        prev_data = graph.graph[current[0]][neighbour]
+                        if mapHeap.arr[pos][1] > current[1]+prev_data:#vDistance[current[0]]+prev_data:
+                                mapHeap.setData(neighbour, current[1]+prev_data)#vDistance[current[0]]+prev_data)
+                                
+        for i in range(1,N+1):
+                if i!=start:
+                        print vDistance[i] if vDistance[i]!=INF else -1,
+        return
+
+f1 = open("dijkstraShortestPathTestcase02.txt",'r')
+
+t = int(f1.readline().strip())
+for a0 in xrange(t):
+    n,m = f1.readline().strip().split(' ')
+    n,m = [int(n),int(m)]
+    t1 = time.time()
+    graph = Graph(n)
+    mapHeap = MapHeap()
+    edges = []
+    for a1 in xrange(m):
+        x,y,r = f1.readline().strip().split(' ')
+        x,y,r = [int(x),int(y),int(r)]
+	#edges.append([x,y,r])
+        mapHeap.insert(x,INF)
+        mapHeap.insert(y,INF)
+    	graph.addEdge(x,y,r)
+
+    #graph.addEdges(edges)
+    t2 = time.time()
+    #print graph.graph
+    s = int(f1.readline().strip())
+    print "OverHeadTime:",t2-t1
+    dijkstraShortestPath(n,graph,mapHeap,s)
+    print
+"""
 t = int(raw_input().strip())
 for a0 in xrange(t):
     n,m = raw_input().strip().split(' ')
@@ -177,6 +226,7 @@ for a0 in xrange(t):
         mapHeap.insert(x,INF)
         mapHeap.insert(y,INF)
     s = int(raw_input().strip())
+    print graph.graph
     dijkstraShortestPath(n,graph,mapHeap,s)
     print
-
+"""
