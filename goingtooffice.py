@@ -118,6 +118,7 @@ class Graph:
                 self.graph = {}
 		self.vDistance = {}
 		self.vParent = {}
+		self.nocomingback = INF
 
 		for i in range(0,vertices):
                 	self.graph[i] = {}
@@ -174,31 +175,45 @@ def dijkstraShortestPath(N,graph,mapHeap,start):
 
 def checkforPath(N,graph,vertices,start,destination,discardEdge,parentStack):
 	found = False
-	print "DiscardEdge:",discardEdge	
-	if discardEdge[1] == graph.vParent.get(discardEdge[0]):
-		key = discardEdge[0]
-		value = discardEdge[1]
-		print "In block I"
-		found = True
-	
-	if found==False and discardEdge[0] == graph.vParent.get(discardEdge[1]):
-		key = discardEdge[1]
-		value = discardEdge[0]
-		print "In block II",graph.vParent.get(discardEdge[1]),graph.vParent.get(value)
-		found = True
-	
+	if min(discardEdge) > graph.nocomingback:
+		return "Infinity"
+
+	#print "DiscardEdge:",discardEdge,
+	if discardEdge[0] in parentStack:
+		index = parentStack.index(discardEdge[0])
+		print "Index:",index
+		if (index > 0) and (index < len(parentStack)-1):
+			print "Inside 01"
+			if parentStack[index-1]==discardEdge[1]:
+				dst = discardEdge[1]
+				src = discardEdge[0]
+				found = True
+			elif parentStack[index+1]==discardEdge[1]:
+				src = discardEdge[0]
+				dst = discardEdge[1]
+
+		elif index == 0 and parentStack[index+1]==discardEdge[1]:
+			print "Inside 02"
+			dst = discardEdge[0]
+			src = discardEdge[1]
+			found = True
+		elif index == len(parentStack)-1 and parentStack[index-1]==discardEdge[1]:
+			print "Inside 03"
+			dst = discardEdge[1]
+			src = discardEdge[0]
+			found = True
+
 	if found==False:
 		return graph.vDistance[destination]
 
 	vDistance = graph.vDistance
 	tempHeap = MapHeap(vertices)
-	print "key:",key,"value:",value
-	dist_u_v,u,v = shortestPath(N,graph,tempHeap,value,key,destination,discardEdge,parentStack)
-	#print "Distance_u_v:",dist_u_v
-	#print "Distance to reach (%d->%d): %d, (%d->%d): %d, (%d->%d): %d"%(start,value,\
-	#	vDistance[value],value,key,dist_u_v,key,destination,vDistance[destination]-vDistance[key])
+	#print "dest:",dst,"source:",src
+	dist_u_v,u,v = shortestPath(N,graph,tempHeap,src,dst,destination,discardEdge,parentStack)
+	if dist_u_v == "Infinity":
+		graph.nocomingback = min(discardEdge)
+		return dist_u_v
 	return vDistance[u]+dist_u_v+(vDistance[destination]-vDistance[v])
-	#return shortestPath(N,graph,tempHeap,start,destination,discardEdge)
 
 def shortestPath(N,graph,mapHeap,start,destination,orgDest,discardEdge,parentStack):
         mapHeap.setData(start,0)
@@ -232,30 +247,35 @@ def shortestPath(N,graph,mapHeap,start,destination,orgDest,discardEdge,parentSta
 
 	new_stack = []
 	key = destination
+	#new_stack_set = set()
 	while key!=None:
 		new_stack.append(key)
+		#new_stack_set.add(key)
 		key = vParent.get(key)
 
 	#print "NewStack:",new_stack
+	#print "RightStack:",rightStack
 	u = None
 	v = None
+	"""
+	if new_stack_set&rightStack:
+		pass
+	else:
+		#print "returning"
+		return "Infinity",u,v
+	"""
 	while new_stack:
 		top = new_stack.pop()
 		if top in leftStack:
 			u = top
 		if v==None and top in rightStack:
 			v = top
-
 		if u and v:
 			break
+	return vDistance[v]-vDistance[u] if vDistance.get(v)!=None and vDistance.get(u)!=None else "Infinity",u,v
 
-	#print "LeftStack:",leftStack
-	#print "RightStack:",rightStack
-	#print "(u,v):",(u,v)
-	
-	return vDistance[v]-vDistance[u] if vDistance[v]!=INF else "Infinity",u,v
-
-f1 = open("/home/utkarsh/utk_reboot/python/graphTheory/goingtoOfficeTestCase.txt",'r')
+"""
+f1 = open("/home/utkarsh/utk_reboot/python/graphTheory/goingtoOfficeTestCase02.txt",'r')
 n,m = f1.readline().strip().split(' ')
 n,m = [int(n),int(m)]
 
@@ -284,13 +304,22 @@ key = d
 while key!=None:
 	parentStack.append(key)
 	key = graph.vParent.get(key)
-print parentStack
+#print parentStack
 
+count1 = 0
+count2 = 0
 for a2 in xrange(q):
 	x,y = f1.readline().strip().split(' ')
 	x,y = [int(x),int(y)]
 	result = checkforPath(n,graph,vertices,s,d,[x,y],parentStack)
 	print result
+	time.sleep(0.2)
+	if result == 185351:
+		count1 += 1
+	if result == "Infinity":
+		count2 += 1
+print count1, count2
+"""
 """
 n,m = sys.stdin.readline().strip().split(' ')
 n,m = [int(n),int(m)]
@@ -307,18 +336,66 @@ for a1 in xrange(m):
 	
 #print graph.graph
 mapHeap = MapHeap(vertices)
-originalSPT = SPT()
 
 s,d = sys.stdin.readline().strip().split(' ')
 s,d = [int(s),int(d)]
 q = int(sys.stdin.readline().strip())
 dijkstraShortestPath(n,graph,mapHeap,s)
-#print "OrgDist:",graph.vDistance
-#print "OrgParent:",graph.vParent
+parentStack = []
+key = d
+while key!=None:
+	parentStack.append(key)
+	key = graph.vParent.get(key)
+print "Parent:",parentStack
 
 for a2 in xrange(q):
 	x,y = sys.stdin.readline().strip().split(' ')
 	x,y = [int(x),int(y)]
-	result = checkforPath(n,graph,vertices,s,d,[x,y])
+	result = checkforPath(n,graph,vertices,s,d,[x,y],parentStack)
 	print result
+
 """
+f1 = open("/home/utkarsh/utk_reboot/python/graphTheory/goingtoOfficeTestCase02.txt",'r')
+n,m = f1.readline().strip().split(' ')
+n,m = [int(n),int(m)]
+
+graph = Graph(n)
+vertices = set()
+
+for a1 in xrange(m):
+	x,y,r = f1.readline().strip().split(' ')
+	x,y,r = [int(x),int(y),int(r)]
+	graph.addEdge(x,y,r)
+	vertices.add(x)
+	vertices.add(y)
+	
+#print graph.graph
+mapHeap = MapHeap(vertices)
+originalSPT = SPT()
+
+s,d = f1.readline().strip().split(' ')
+s,d = [int(s),int(d)]
+q = int(raw_input().strip())
+dijkstraShortestPath(n,graph,mapHeap,s)
+#print "OrgDist:",graph.vDistance
+#print "OrgParent:",graph.vParent
+parentStack = []
+key = d
+while key!=None:
+	parentStack.append(key)
+	key = graph.vParent.get(key)
+print parentStack
+
+count1 = 0
+count2 = 0
+for a2 in xrange(q):
+	x,y = raw_input().strip().split(' ')
+	x,y = [int(x),int(y)]
+	result = checkforPath(n,graph,vertices,s,d,[x,y],parentStack)
+	print result
+	time.sleep(0.2)
+	if result == 185351:
+		count1 += 1
+	if result == "Infinity":
+		count2 += 1
+print count1, count2
