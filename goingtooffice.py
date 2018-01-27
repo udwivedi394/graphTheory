@@ -181,9 +181,9 @@ def checkforPath(N,graph,vertices,start,destination,discardEdge,parentStack):
 	#print "DiscardEdge:",discardEdge,
 	if discardEdge[0] in parentStack:
 		index = parentStack.index(discardEdge[0])
-		print "Index:",index
+		#print "Index:",index
 		if (index > 0) and (index < len(parentStack)-1):
-			print "Inside 01"
+			#print "Inside 01"
 			if parentStack[index-1]==discardEdge[1]:
 				dst = discardEdge[1]
 				src = discardEdge[0]
@@ -193,12 +193,12 @@ def checkforPath(N,graph,vertices,start,destination,discardEdge,parentStack):
 				dst = discardEdge[1]
 
 		elif index == 0 and parentStack[index+1]==discardEdge[1]:
-			print "Inside 02"
+			#print "Inside 02"
 			dst = discardEdge[0]
 			src = discardEdge[1]
 			found = True
 		elif index == len(parentStack)-1 and parentStack[index-1]==discardEdge[1]:
-			print "Inside 03"
+			#print "Inside 03"
 			dst = discardEdge[1]
 			src = discardEdge[0]
 			found = True
@@ -209,18 +209,30 @@ def checkforPath(N,graph,vertices,start,destination,discardEdge,parentStack):
 	vDistance = graph.vDistance
 	tempHeap = MapHeap(vertices)
 	#print "dest:",dst,"source:",src
-	dist_u_v,u,v = shortestPath(N,graph,tempHeap,src,dst,destination,discardEdge,parentStack)
+	dist_u_v,u,v = shortestPath(N,graph,tempHeap,src,dst,destination,discardEdge,parentStack,vertices)
 	if dist_u_v == "Infinity":
 		graph.nocomingback = min(discardEdge)
 		return dist_u_v
-	return vDistance[u]+dist_u_v+(vDistance[destination]-vDistance[v])
+	try:
+		return vDistance[u]+dist_u_v+(vDistance[destination]-vDistance[v])
+	except KeyError:
+		return "Infinity"
 
-def shortestPath(N,graph,mapHeap,start,destination,orgDest,discardEdge,parentStack):
+def shortestPath(N,graph,mapHeap,start,destination,orgDest,discardEdge,parentStack,vertices):
+	#print "Start,Destination:",(start,destination)
         mapHeap.setData(start,0)
         vDistance = {}
 	vParent = {}
 	#print mapHeap.arr
-        while mapHeap.arr and vDistance.get(destination)==None:
+	mark = parentStack.index(start)
+	leftStack = set(parentStack[mark:])
+	rightStack = set(parentStack[:mark])
+       	#print "LeftStack:",leftStack
+	#print "RightStack:",rightStack
+
+	mainLoop = True
+	specialNodes = set()
+	while mapHeap.arr and vDistance.get(destination)==None and mainLoop:
                 current = mapHeap.extractMin()
                 mapHeap.delete(current[0])
 
@@ -236,15 +248,21 @@ def shortestPath(N,graph,mapHeap,start,destination,orgDest,discardEdge,parentSta
                         if pos==None:
                                 continue
                         prev_data = graph.graph[current[0]][neighbour]
+			if neighbour in rightStack:
+				#destination = neighbour
+				vParent[neighbour] = current[0]
+                		vDistance[neighbour] = prev_data+current[1]
+				specialNodes.add(neighbour)
+				#internalMinDistance = 
+				#mainLoop = False
+				#break
+
                         if mapHeap.arr[pos][1] > current[1]+prev_data:#vDistance[current[0]]+prev_data:
                                 mapHeap.setData(neighbour, current[1]+prev_data)#vDistance[current[0]]+prev_data)
 				vParent[neighbour] = current[0]                                
 	#print "NewParent:",vParent
 	#print "NewDist:",vDistance
-	mark = parentStack.index(start)
-	leftStack = set(parentStack[mark:])
-	rightStack = set(parentStack[:mark])
-
+	#print "Specail Nodes:",specialNodes
 	new_stack = []
 	key = destination
 	#new_stack_set = set()
@@ -254,7 +272,6 @@ def shortestPath(N,graph,mapHeap,start,destination,orgDest,discardEdge,parentSta
 		key = vParent.get(key)
 
 	#print "NewStack:",new_stack
-	#print "RightStack:",rightStack
 	u = None
 	v = None
 	"""
@@ -272,9 +289,40 @@ def shortestPath(N,graph,mapHeap,start,destination,orgDest,discardEdge,parentSta
 			v = top
 		if u and v:
 			break
-	return vDistance[v]-vDistance[u] if vDistance.get(v)!=None and vDistance.get(u)!=None else "Infinity",u,v
+	v = parentStack[min(parentStack.index(node) for node in specialNodes)]
+	#print "u,v:",(u,v),
+	dist = dijkstraShortestPath02(N,graph,MapHeap(vertices),u,v,discardEdge)
+	#print dist
+	return dist, u, v
+	#return vDistance[v]-vDistance[u] if vDistance.get(v)!=None and vDistance.get(u)!=None else "Infinity",u,v
 
-"""
+def dijkstraShortestPath02(N,graph,mapHeap,start,dest,discardEdge):
+        mapHeap.setData(start,0)
+        vDistance = {}
+	vParent = {}
+
+        while mapHeap.arr and vDistance.get(dest)==None:
+                current = mapHeap.extractMin()
+                mapHeap.delete(current[0])
+
+                vDistance[current[0]] = current[1]
+		if current[0] == start:
+			vParent[start] = None
+
+                for neighbour in graph.graph[current[0]]:
+			if set([current[0],neighbour])==set(discardEdge):
+				continue
+                        #If vertex exists in MapHeap then returns its position
+                        pos = mapHeap.contains(neighbour)
+                        if pos==None:
+                                continue
+
+                        prev_data = graph.graph[current[0]][neighbour]
+                        if mapHeap.arr[pos][1] > current[1]+prev_data:
+				mapHeap.setData(neighbour, current[1]+prev_data)
+				vParent[neighbour] = current[0]                        
+        return vDistance[dest]
+#"""
 f1 = open("/home/utkarsh/utk_reboot/python/graphTheory/goingtoOfficeTestCase02.txt",'r')
 n,m = f1.readline().strip().split(' ')
 n,m = [int(n),int(m)]
@@ -311,15 +359,16 @@ count2 = 0
 for a2 in xrange(q):
 	x,y = f1.readline().strip().split(' ')
 	x,y = [int(x),int(y)]
+	print "Edge:",(x,y)
 	result = checkforPath(n,graph,vertices,s,d,[x,y],parentStack)
 	print result
-	time.sleep(0.2)
+	#time.sleep(0.2)
 	if result == 185351:
 		count1 += 1
 	if result == "Infinity":
 		count2 += 1
 print count1, count2
-"""
+#"""
 """
 n,m = sys.stdin.readline().strip().split(' ')
 n,m = [int(n),int(m)]
@@ -355,6 +404,7 @@ for a2 in xrange(q):
 	print result
 
 """
+"""
 f1 = open("/home/utkarsh/utk_reboot/python/graphTheory/goingtoOfficeTestCase02.txt",'r')
 n,m = f1.readline().strip().split(' ')
 n,m = [int(n),int(m)]
@@ -371,7 +421,6 @@ for a1 in xrange(m):
 	
 #print graph.graph
 mapHeap = MapHeap(vertices)
-originalSPT = SPT()
 
 s,d = f1.readline().strip().split(' ')
 s,d = [int(s),int(d)]
@@ -384,13 +433,15 @@ key = d
 while key!=None:
 	parentStack.append(key)
 	key = graph.vParent.get(key)
-print parentStack
+#print parentStack
+#print graph.graph[0]
 
 count1 = 0
 count2 = 0
 for a2 in xrange(q):
 	x,y = raw_input().strip().split(' ')
 	x,y = [int(x),int(y)]
+	print "Edge:",(x,y)
 	result = checkforPath(n,graph,vertices,s,d,[x,y],parentStack)
 	print result
 	time.sleep(0.2)
@@ -399,3 +450,4 @@ for a2 in xrange(q):
 	if result == "Infinity":
 		count2 += 1
 print count1, count2
+#"""
